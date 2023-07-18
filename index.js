@@ -1,7 +1,7 @@
 const express = require("express");
 const cors = require("cors")
 require('dotenv').config()
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const app = express();
 const port = process.env.PORT || 5000;
 
@@ -11,7 +11,7 @@ app.use(express.json())
 
 
 
-const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.xoojudr.mongodb.net/?retryWrites=true&w=majority`;
+const uri = `mongodb+srv://studentTable:TQAjioK6rqYHHJDC@cluster0.xoojudr.mongodb.net/?retryWrites=true&w=majority`;
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {
@@ -40,19 +40,26 @@ async function run() {
         res.send(result);
     });
 
-    app.patch("/update/:id", async (req, res) => {
-      const id = req.params.id;
-      const type = req.body;
-      // const query = { _id: new ObjectId(id) };
-      // const updateDoc = {
-      //   $set: {
-      //     type: type,
-      //   },
-      // };
-      console.log(id)
-      console.log(type)
-      // const result = await labCollection.updateOne(query, updateDoc);
-      // res.send(result);
+    app.delete('/deletedata/:id', async (req, res) => {
+      const filter = {_id: new ObjectId(req.params.id)};
+        const result = await labCollection.deleteOne(filter)
+        res.send(result);
+    });
+
+    app.put("/updatedata/:id", async (req, res) => {
+      const filter = {_id: new ObjectId(req.params.id)};
+      const updateDoc = {
+        $set: {
+          roll: req.body.roll,
+          name: req.body.name,
+          session: req.body.session,
+          current_year: req.body.current_year,
+          semester: req.body.semester,
+        },
+      };
+
+      const result = await labCollection.updateOne(filter, updateDoc);
+      res.send(result);
     });
     
     // Send a ping to confirm a successful connection
